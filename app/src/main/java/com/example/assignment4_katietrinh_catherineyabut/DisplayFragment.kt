@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.assignment4_katietrinh_catherineyabut.adapter.TodoAdapter
@@ -97,6 +98,9 @@ class DisplayFragment : Fragment() {
             .addOnSuccessListener { result ->
                 val todos = result.toObjects(Todo::class.java)
                 todoAdapter.updateData(todos)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }

@@ -20,16 +20,22 @@ class TodoDetailActivity : AppCompatActivity() {
 //            insets
 //        }
 
-        val todoId = intent.getStringExtra("todo_id")
+        //val todoId = intent.getStringExtra("todo_id")
         val btnDelete = findViewById<Button>(R.id.btn_delete)
 
         btnDelete.setOnClickListener {
-            FirebaseFirestore.getInstance().collection("todos")
-                .document(todoId!!)
+            val todoId = intent.getStringExtra("todo_id") ?: ""
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("todos")
+                .document(todoId)
                 .delete()
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Todo deleted!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Deleted!", Toast.LENGTH_SHORT).show()
                     finish()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }

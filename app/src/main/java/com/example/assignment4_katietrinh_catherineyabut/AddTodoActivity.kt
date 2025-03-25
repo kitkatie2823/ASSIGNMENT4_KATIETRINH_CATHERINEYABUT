@@ -24,18 +24,34 @@ class AddTodoActivity : AppCompatActivity() {
 
         val btnSave = findViewById<Button>(R.id.btn_save)
         btnSave.setOnClickListener {
-            val userId = findViewById<EditText>(R.id.et_user_id).text.toString().toInt()
-            val id = findViewById<EditText>(R.id.et_id).text.toString().toInt()
+            val userId = findViewById<EditText>(R.id.et_user_id).text.toString().toString()
+            val id = findViewById<EditText>(R.id.et_id).text.toString().toString()
             val title = findViewById<EditText>(R.id.et_title).text.toString()
 
-            val todo = Todo(userId, id, title)
-            FirebaseFirestore.getInstance().collection("todos")
-                .document(id.toString())
-                .set(todo)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Todo added!", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
+            if (userId.isEmpty() || id.isEmpty() || title.isEmpty()) {
+                Toast.makeText(this, "Fill all fields!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            try {
+                val userId = userId.toInt()
+                val id = id.toInt()
+                // Proceed to save to Firestore
+                val db = FirebaseFirestore.getInstance()
+                val todo = Todo(userId, id, title, completed = false)
+                db.collection("todos")
+                    .document(id.toString()) // Use a unique ID (e.g., todo.id)
+                    .set(todo)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Todo saved!", Toast.LENGTH_SHORT).show()
+                        finish() // Close the activity
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            } catch (e: NumberFormatException) {
+                Toast.makeText(this, "Invalid ID format!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
